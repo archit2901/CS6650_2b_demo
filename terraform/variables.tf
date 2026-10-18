@@ -1,7 +1,7 @@
 # Region to deploy into
 variable "aws_region" {
   type    = string
-  default = "us-west-2"
+  default = "us-east-1"
 }
 
 # ECR & ECS settings
