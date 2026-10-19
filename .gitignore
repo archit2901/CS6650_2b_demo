@@ -1,4 +1,20 @@
-**.tfvars
-**.tfstate
-**.tfstate.*
-**/.terraform/
+# Terraform (keep .terraform.lock.hcl committed)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+
+# Secrets
+.env
+*.pem
+
+# Python
+.venv/
+__pycache__/
+
+# Go build output
+src/product-service
+
+# macOS
+.DS_Store

@@ -1,0 +1,15 @@
+{"time":"2026-10-19T04:29:03.062562196Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/17/details","status":204,"duration_ms":0.04}
+{"time":"2026-10-19T04:29:03.06271807Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/54","status":200,"duration_ms":0.003}
+{"time":"2026-10-19T04:29:03.063174359Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/4","status":200,"duration_ms":0.002}
+{"time":"2026-10-19T04:29:03.063622106Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/41","status":200,"duration_ms":0.002}
+{"time":"2026-10-19T04:29:03.063745313Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/5/details","status":204,"duration_ms":0.017}
+{"time":"2026-10-19T04:29:03.064133936Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/88","status":200,"duration_ms":0.003}
+{"time":"2026-10-19T04:29:03.064155269Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/16","status":200,"duration_ms":0.003}
+{"time":"2026-10-19T04:29:03.064301227Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/91","status":200,"duration_ms":0.003}
+{"time":"2026-10-19T04:29:03.065158388Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/88","status":200,"duration_ms":0.003}
+{"time":"2026-10-19T04:29:03.065413178Z","level":"INFO","msg":"request","method":"GET","endpoint":"/products/:productId","path":"/products/80","status":200,"duration_ms":0.003}
+{"time":"2026-10-19T04:41:36.089139971Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/1/details","status":400,"duration_ms":0.107}
+{"time":"2026-10-19T04:41:36.098196205Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/1/details","status":400,"duration_ms":0.069}
+{"time":"2026-10-19T04:41:36.107067023Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/abc/details","status":400,"duration_ms":0.026}
+{"time":"2026-10-19T04:41:36.115302554Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/999/details","status":404,"duration_ms":0.102}
+{"time":"2026-10-19T04:41:36.131819781Z","level":"INFO","msg":"request","method":"POST","endpoint":"/products/:productId/details","path":"/products/1/details","status":500,"duration_ms":0.312}

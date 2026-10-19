@@ -2,11 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Product mirrors components/schemas/Product in api.yaml.
@@ -127,14 +133,77 @@ func faultInjection() gin.HandlerFunc {
 	}
 }
 
+var (
+	// Rate: count every request
+	requestsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "http_requests_total",
+		Help: "Total HTTP requests (Rate).",
+	}, []string{"method", "endpoint", "status"})
+
+	// Errors: count every non-2xx response
+	errorsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "http_request_errors_total",
+		Help: "Total HTTP requests with a non-2xx status (Errors).",
+	}, []string{"method", "endpoint", "status"})
+
+	// Duration: latency histogram (buckets from 50µs up to ~1.6s)
+	requestDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "http_request_duration_seconds",
+		Help:    "HTTP request latency in seconds (Duration).",
+		Buckets: prometheus.ExponentialBuckets(0.00005, 2, 16),
+	}, []string{"method", "endpoint"})
+
+	logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+)
+
+// observability records RED metrics and writes one JSON log line per request.
+func observability() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/metrics" {
+			c.Next() // don't measure Prometheus's own scrapes
+			return
+		}
+
+		start := time.Now()
+		c.Next() // run the rest of the chain: recovery, fault injection, handler
+		duration := time.Since(start)
+
+		method := c.Request.Method
+		status := c.Writer.Status()
+		endpoint := c.FullPath() // route template, e.g. /products/:productId
+		if endpoint == "" {
+			endpoint = "unmatched"
+		}
+		statusStr := strconv.Itoa(status)
+
+		requestsTotal.WithLabelValues(method, endpoint, statusStr).Inc()
+		if status < 200 || status >= 300 {
+			errorsTotal.WithLabelValues(method, endpoint, statusStr).Inc()
+		}
+		requestDuration.WithLabelValues(method, endpoint).Observe(duration.Seconds())
+
+		logger.Info("request",
+			"method", method,
+			"endpoint", endpoint,
+			"path", c.Request.URL.Path,
+			"status", status,
+			"duration_ms", float64(duration.Microseconds())/1000,
+		)
+	}
+}
+
 func main() {
 	store := NewProductStore(100)
 
 	router := gin.New()
-	router.Use(gin.Logger(), gin.CustomRecovery(recoveryHandler), faultInjection())
+	router.Use(observability(), gin.CustomRecovery(recoveryHandler), faultInjection())
 
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	router.GET("/products/:productId", getProductHandler(store))
 	router.POST("/products/:productId/details", addProductDetailsHandler(store))
 
-	router.Run(":8080")
+	if err := router.Run(":8080"); err != nil {
+		logger.Error("server failed to start", "error", err)
+		os.Exit(1)
+	}
 }
